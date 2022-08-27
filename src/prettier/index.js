@@ -1,5 +1,5 @@
 import amqplib from 'amqplib';
-import {readability} from '../lib/readability/index.js';
+import { readability } from '../lib/readability/index.js';
 import { WorkerBase } from '../lib/worker-base/index.js';
 
 async function bootstrap() {
@@ -15,28 +15,31 @@ async function bootstrap() {
   await worker.assert({
     consumerOptions: {
       exchange: 'html.prettier.request',
-      type: 'topic'
+      type: 'topic',
     },
     publisherOptions: {
       exchange: 'html.converter.request',
       type: 'topic',
-      pattern: 'html.converter.request'
+      pattern: 'html.converter.request',
     },
     errorOptions: {
       exchange: 'errors',
       type: 'topic',
-      pattern: 'html.prettier.error'
-    }
+      pattern: 'html.prettier.error',
+    },
   });
   await worker.register({
-    name: 'prettier', pattern: 'html.prettier.request', handler: async (message) => {
+    name: 'prettier',
+    pattern: 'html.prettier.request',
+    handler: async (message) => {
       const prettier = readability(message.content.toString());
+      if (!prettier?.content) throw new Error('Cannot get readability view');
       console.log('prettier: ' + prettier);
       return {
-        data: prettier
-      }
-    }
+        data: prettier?.content,
+      };
+    },
   });
 }
 
-export default bootstrap
+export default bootstrap;
