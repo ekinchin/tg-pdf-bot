@@ -1,8 +1,8 @@
-import type { Connection, ConsumeMessage } from 'amqplib'
+import type { Connection, ConsumeMessage } from 'amqplib';
 
 export type QueueOptions = {
   exchange: string;
-  type: "topic" | "direct" | "fanout";
+  type: 'topic' | 'direct' | 'fanout';
 };
 
 export type ConsumerOptions = {};
@@ -19,11 +19,10 @@ export type WorkerBaseOptions = {
 };
 
 export type AssertOptions = {
-  consumerOptions: ConsumerQueueOptions,
-  publisherOptions: PublisherQueueOptions,
-  errorOptions: PublisherQueueOptions
-}
-
+  consumerOptions: ConsumerQueueOptions;
+  publisherOptions: PublisherQueueOptions;
+  errorOptions: PublisherQueueOptions;
+};
 
 export type WorkerResult = {
   data: Buffer | string;
@@ -37,9 +36,7 @@ export type RegisterOptions = {
 };
 
 export class WorkerBase {
-  constructor({ conection }: {
-    conection: Bluebird<amqp.Connection>;
-  });
-  assert(options:AssertOptions): Promise<void>;
+  constructor({ conection }: { conection: Bluebird<amqp.Connection> });
+  assert(options: AssertOptions): Promise<void>;
   register(registerOptions: RegisterOptions): Promise<void>;
 }

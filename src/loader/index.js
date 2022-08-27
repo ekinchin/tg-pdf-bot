@@ -14,25 +14,27 @@ async function bootstrap() {
   await worker.assert({
     consumerOptions: {
       exchange: 'html.loader.request',
-      type: 'topic'
+      type: 'topic',
     },
     publisherOptions: {
       exchange: 'html.prettier.request',
       type: 'topic',
-      pattern: 'html.prettier.request'
+      pattern: 'html.prettier.request',
     },
     errorOptions: {
       exchange: 'errors',
       type: 'topic',
-      pattern: 'html.loader.error'
-    }
+      pattern: 'html.loader.error',
+    },
   });
   await worker.register({
-    name: 'loader', pattern: 'html.loader.request', handler: async (message) => {
+    name: 'loader',
+    pattern: 'html.loader.request',
+    handler: async (message) => {
       console.log('loader: ' + message.content.toString());
-      return { data: message.content }
-    }
+      return { data: message.content };
+    },
   });
 }
 
-export default bootstrap
+export default bootstrap;

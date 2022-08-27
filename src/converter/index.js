@@ -15,28 +15,30 @@ async function bootstrap() {
   await worker.assert({
     consumerOptions: {
       exchange: 'html.converter.request',
-      type: 'topic'
+      type: 'topic',
     },
     publisherOptions: {
       exchange: 'result',
       type: 'topic',
-      pattern: 'pdf.output.result'
+      pattern: 'pdf.output.result',
     },
     errorOptions: {
       exchange: 'errors',
       type: 'topic',
-      pattern: 'html.converter.error'
-    }
+      pattern: 'html.converter.error',
+    },
   });
   await worker.register({
-    name: 'converter', pattern: 'html.converter.request', handler: async (message) => {
+    name: 'converter',
+    pattern: 'html.converter.request',
+    handler: async (message) => {
       console.log('converter: ' + message.content.toString());
-      const pdf = await htmlToPdf(message.content.toString(), './')
+      const pdf = await htmlToPdf(message.content.toString(), './');
       return {
-        data: pdf
-      }
-    }
+        data: pdf,
+      };
+    },
   });
 }
 
-export default bootstrap
+export default bootstrap;
