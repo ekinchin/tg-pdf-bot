@@ -1,0 +1,43 @@
+{
+  "name": "tg-pdf-bot",
+  "version": "0.0.1",
+  "description": "export web page from html to pdf",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint \"**/*.js\"",
+    "lint:fix": "eslint --fix \"**/*.js\"",
+    "prettier": "prettier --write \"**/*.js\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ekinchin/tg-pdf-bot.git"
+  },
+  "author": "Evgenii Kinchin",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ekinchin/tg-pdf-bot/issues"
+  },
+  "homepage": "https://github.com/ekinchin/tg-pdf-bot#readme",
+  "dependencies": {
+    "@mozilla/readability": "^0.4.2",
+    "amqplib": "^0.10.2",
+    "html-pdf": "^3.0.1",
+    "jsdom": "^20.0.0"
+  },
+  "devDependencies": {
+    "@types/amqplib": "^0.8.2",
+    "@types/html-pdf": "^3.0.0",
+    "@types/jsdom": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^5.34.0",
+    "@typescript-eslint/parser": "^5.34.0",
+    "eslint": "^8.22.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "prettier": "^2.7.1",
+    "typescript": "^4.8.2"
+  }
+}
