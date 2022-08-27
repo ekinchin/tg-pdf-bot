@@ -1,4 +1,5 @@
 import amqplib from 'amqplib';
+import {readability} from '../lib/readability/index.js';
 import { WorkerBase } from '../lib/worker-base/index.js';
 
 async function bootstrap() {
@@ -13,15 +14,29 @@ async function bootstrap() {
   });
   await worker.assert({
     consumerOptions: {
-      exchange: 'html.loader.request',
+      exchange: 'html.prettier.request',
       type: 'topic'
     },
     publisherOptions: {
-      exchange: 'html.loader.request',
-      type: 'topic'
+      exchange: 'html.converter.request',
+      type: 'topic',
+      pattern: 'html.converter.request'
+    },
+    errorOptions: {
+      exchange: 'errors',
+      type: 'topic',
+      pattern: 'html.prettier.error'
     }
   });
-  await worker.register({name: 'prettier', pattern:'worker', handler: (message) => console.log('prettier')});
+  await worker.register({
+    name: 'prettier', pattern: 'html.prettier.request', handler: async (message) => {
+      const prettier = readability(message.content.toString());
+      console.log('prettier: ' + prettier);
+      return {
+        data: prettier
+      }
+    }
+  });
 }
 
 export default bootstrap

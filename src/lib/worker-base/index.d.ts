@@ -5,10 +5,10 @@ export type QueueOptions = {
   type: "topic" | "direct" | "fanout";
 };
 
-export type ConsumerOptions = {
-};
+export type ConsumerOptions = {};
 
 export type PublisherOptions = {
+  pattern: string;
 };
 
 export type ConsumerQueueOptions = QueueOptions & ConsumerOptions;
@@ -19,13 +19,14 @@ export type WorkerBaseOptions = {
 };
 
 export type AssertOptions = {
-    consumerOptions: ConsumerQueueOptions,
-    publisherOptions: PublisherQueueOptions,
-  }
+  consumerOptions: ConsumerQueueOptions,
+  publisherOptions: PublisherQueueOptions,
+  errorOptions: PublisherQueueOptions
+}
 
 
 export type WorkerResult = {
-  data: Record<string, unknown>;
+  data: Buffer | string;
   error?: Error;
 };
 

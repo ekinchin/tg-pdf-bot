@@ -17,11 +17,22 @@ async function bootstrap() {
       type: 'topic'
     },
     publisherOptions: {
-      exchange: 'html.loader.request',
-      type: 'topic'
+      exchange: 'html.prettier.request',
+      type: 'topic',
+      pattern: 'html.prettier.request'
+    },
+    errorOptions: {
+      exchange: 'errors',
+      type: 'topic',
+      pattern: 'html.loader.error'
     }
   });
-  await worker.register({name: 'loader', pattern:'worker', handler: (message) => console.log('loader')});
+  await worker.register({
+    name: 'loader', pattern: 'html.loader.request', handler: async (message) => {
+      console.log('loader: ' + message.content.toString());
+      return { data: message.content }
+    }
+  });
 }
 
 export default bootstrap
