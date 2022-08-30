@@ -1,10 +1,11 @@
 import amqplib from 'amqplib';
 import { readability } from '../lib/readability/index.js';
 import { WorkerBase } from '../lib/worker-base/index.js';
+import { pipeline } from '../pipeline/index.js';
 
 async function bootstrap() {
   const worker = new WorkerBase({
-    conection: await amqplib.connect({
+    connection: await amqplib.connect({
       hostname: 'localhost',
       port: 5671,
       vhost: 'exporter',
@@ -14,13 +15,13 @@ async function bootstrap() {
   });
   await worker.assert({
     consumerOptions: {
-      exchange: 'html.prettier.request',
+      exchange: 'prettier',
       type: 'topic',
     },
     publisherOptions: {
-      exchange: 'html.converter.request',
+      exchange: 'converter',
       type: 'topic',
-      pattern: 'html.converter.request',
+      pattern: pipeline.converter,
     },
     errorOptions: {
       exchange: 'errors',
@@ -30,11 +31,10 @@ async function bootstrap() {
   });
   await worker.register({
     name: 'prettier',
-    pattern: 'html.prettier.request',
+    pattern: pipeline.prettier,
     handler: async (message) => {
       const prettier = readability(message.content.toString());
       if (!prettier?.content) throw new Error('Cannot get readability view');
-      console.log('prettier: ' + prettier);
       return {
         data: prettier?.content,
       };

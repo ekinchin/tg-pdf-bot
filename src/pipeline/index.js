@@ -1,0 +1,2 @@
+/** @type {import('./index.js').Pipeline} */
+export const pipeline = {loader: 'html.loader.request', prettier: 'html.prettier.request', converter:'html.converter.request', result: 'pdf.output.result'};

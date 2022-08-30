@@ -1,9 +1,10 @@
-import amqplib from 'amqplib';
+import { connect } from 'amqplib';
 import { WorkerBase } from '../lib/worker-base/index.js';
+import { pipeline } from '../pipeline/index.js';
 
 async function bootstrap() {
   const worker = new WorkerBase({
-    conection: await amqplib.connect({
+    connection: await connect({
       hostname: 'localhost',
       port: 5671,
       vhost: 'exporter',
@@ -13,13 +14,13 @@ async function bootstrap() {
   });
   await worker.assert({
     consumerOptions: {
-      exchange: 'html.loader.request',
+      exchange: 'loader',
       type: 'topic',
     },
     publisherOptions: {
-      exchange: 'html.prettier.request',
+      exchange: 'prettier',
       type: 'topic',
-      pattern: 'html.prettier.request',
+      pattern: pipeline.prettier,
     },
     errorOptions: {
       exchange: 'errors',
@@ -29,10 +30,14 @@ async function bootstrap() {
   });
   await worker.register({
     name: 'loader',
-    pattern: 'html.loader.request',
+    pattern: pipeline.loader,
     handler: async (message) => {
-      console.log('loader: ' + message.content.toString());
-      return { data: message.content };
+      const response = await fetch(message.content.toString());
+      if (response.ok) {
+        const html = await response.text();
+        return { data: html };
+      }
+      throw new Error(response.statusText);
     },
   });
 }

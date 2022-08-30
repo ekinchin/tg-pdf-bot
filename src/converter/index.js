@@ -1,10 +1,11 @@
 import amqplib from 'amqplib';
 import { htmlToPdf } from '../lib/html-to-pdf/index.js';
 import { WorkerBase } from '../lib/worker-base/index.js';
+import { pipeline } from '../pipeline/index.js';
 
 async function bootstrap() {
   const worker = new WorkerBase({
-    conection: await amqplib.connect({
+    connection: await amqplib.connect({
       hostname: 'localhost',
       port: 5671,
       vhost: 'exporter',
@@ -14,13 +15,13 @@ async function bootstrap() {
   });
   await worker.assert({
     consumerOptions: {
-      exchange: 'html.converter.request',
+      exchange: 'converter',
       type: 'topic',
     },
     publisherOptions: {
       exchange: 'result',
       type: 'topic',
-      pattern: 'pdf.output.result',
+      pattern: pipeline.result,
     },
     errorOptions: {
       exchange: 'errors',
@@ -30,10 +31,10 @@ async function bootstrap() {
   });
   await worker.register({
     name: 'converter',
-    pattern: 'html.converter.request',
+    pattern: pipeline.converter,
     handler: async (message) => {
-      console.log('converter: ' + message.content.toString());
-      const pdf = await htmlToPdf(message.content.toString(), './');
+      const html = message.content.toString();
+      const pdf = await htmlToPdf(html, './');
       return {
         data: pdf,
       };

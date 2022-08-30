@@ -4,7 +4,8 @@ import Logger from '../logger/index.js';
 import { Buffer } from 'buffer';
 
 /**
- * @type {import("./index").WorkerBase}
+ * @typedef {import('./index').IWorkerBase} IWorkerBase
+ * @implements {IWorkerBase}
  */
 export class WorkerBase {
   #connection;
@@ -55,18 +56,21 @@ export class WorkerBase {
   #errorRoutingKey = '';
 
   /**
+   * @constructor
    * @param {import('./index').WorkerBaseOptions} options
    */
-  constructor({ conection }) {
-    this.#connection = conection;
+  constructor({ connection }) {
+    this.#connection = connection;
   }
 
   /**
-   * @param {import('./index').AssertOptions} options
+   * @param {Parameters<import('./index').IWorkerBase['assert']>[0]} options
    * @returns {Promise<void>}
    */
   async assert({ consumerOptions, publisherOptions, errorOptions }) {
-    Logger.log({ message: `assert` });
+    Logger.log({
+      message: `assert consumer: ${consumerOptions.exchange}, publisher: ${publisherOptions.exchange}`,
+    });
     const publisherCh = await this.#connection.createChannel();
     await publisherCh.assertExchange(
       publisherOptions.exchange,
@@ -92,14 +96,16 @@ export class WorkerBase {
   }
 
   /**
-   * @param {import('./index').RegisterOptions} options
+   * @param {Parameters<import('./index').IWorkerBase['register']>[0]} options
    * @returns {Promise<void>}
    */
   async register({ handler, name, pattern }) {
-    Logger.log({ message: `register ${name}` });
+    Logger.log({ message: `register name: ${name}, pattern: ${pattern}` });
     if (this.#registers.has(name)) {
       throw new Error(`Already registered handler name: ${name}`);
     }
+    this.#registers.set(name, name);
+
     if (!this.#consumerCh || !this.#publisherCh) {
       throw new Error('Consumer and/or publisher not asserted');
     }
@@ -111,8 +117,8 @@ export class WorkerBase {
       pattern
     );
 
-    this.#consumerCh.consume(queue.queue, async (message) => {
-      Logger.log({ message: `consume ${name}` });
+    await this.#consumerCh.consume(queue.queue, async (message) => {
+      Logger.log({ message: `consume ${handler.name}` });
       if (!message) return;
       try {
         const result = await handler(message);
@@ -140,9 +146,5 @@ export class WorkerBase {
         this.#consumerCh?.ack(message);
       }
     });
-  }
-
-  async detach() {
-    this.#connection.close();
   }
 }

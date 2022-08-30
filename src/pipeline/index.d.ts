@@ -1,1 +1,1 @@
-export type Pipeline = Array<string>
+export const pipeline = Record<string, string>
