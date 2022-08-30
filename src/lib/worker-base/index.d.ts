@@ -15,7 +15,7 @@ export type ConsumerQueueOptions = QueueOptions & ConsumerOptions;
 export type PublisherQueueOptions = QueueOptions & PublisherOptions;
 
 export type WorkerBaseOptions = {
-  conection: Connection;
+  connection: Connection;
 };
 
 export type AssertOptions = {
@@ -35,8 +35,13 @@ export type RegisterOptions = {
   handler: (msg: ConsumeMessage) => Promise<WorkerResult>;
 };
 
-export class WorkerBase {
-  constructor({ conection }: { conection: Bluebird<amqp.Connection> });
+export interface IWorkerBase {
+  assert(options: AssertOptions): Promise<void>;
+  register(registerOptions: RegisterOptions): Promise<void>;
+}
+
+export class WorkerBase implements IWorkerBase {
+  constructor({ connection }: { connection: Connection });
   assert(options: AssertOptions): Promise<void>;
   register(registerOptions: RegisterOptions): Promise<void>;
 }
